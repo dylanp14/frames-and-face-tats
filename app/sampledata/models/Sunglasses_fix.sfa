@@ -1,0 +1,152 @@
+{
+  animations: [
+    {
+      clips: [
+        {
+          name: 'Camera.001|Camera.001|Default Take|Layer0',
+        },
+        {
+          name: 'Camera.001|Cube_001|Default Take|Layer0',
+        },
+        {
+          name: 'Camera.001|Cube_002|Default Take|Layer0',
+        },
+        {
+          name: 'Camera.001|Cube_003|Default Take|Layer0',
+        },
+        {
+          name: 'Camera.001|Cube|Default Take|Layer0',
+        },
+        {
+          name: 'Camera.001|Plane|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_002|Camera.001|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_002|Cube_001|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_002|Cube_002|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_002|Cube_003|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_002|Cube|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_002|Plane|Default Take|Layer0',
+        },
+        {
+          name: 'Cube|Camera.001|Default Take|Layer0',
+        },
+        {
+          name: 'Cube|Cube_001|Default Take|Layer0',
+        },
+        {
+          name: 'Cube|Cube_002|Default Take|Layer0',
+        },
+        {
+          name: 'Cube|Cube_003|Default Take|Layer0',
+        },
+        {
+          name: 'Cube|Cube|Default Take|Layer0',
+        },
+        {
+          name: 'Cube|Plane|Default Take|Layer0',
+        },
+        {
+          name: 'Plane|Camera.001|Default Take|Layer0',
+        },
+        {
+          name: 'Plane|Cube_001|Default Take|Layer0',
+        },
+        {
+          name: 'Plane|Cube_002|Default Take|Layer0',
+        },
+        {
+          name: 'Plane|Cube_003|Default Take|Layer0',
+        },
+        {
+          name: 'Plane|Cube|Default Take|Layer0',
+        },
+        {
+          name: 'Plane|Plane|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_001|Camera.001|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_001|Cube_001|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_001|Cube_002|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_001|Cube_003|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_001|Cube|Default Take|Layer0',
+        },
+        {
+          name: 'Cube_001|Plane|Default Take|Layer0',
+        },
+      ],
+      path: 'sampledata/models/Sunglasses_fix.fbx',
+    },
+  ],
+  materials: [
+    {
+      name: 'unnamed material',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'Orientation',
+      'BoneIndices',
+      'BoneWeights',
+    ],
+    collision: {},
+    file: 'sampledata/models/Sunglasses_fix.fbx',
+    name: 'Sunglasses_fix',
+    recenter: 'root',
+  },
+  version: '0.54:2',
+}
