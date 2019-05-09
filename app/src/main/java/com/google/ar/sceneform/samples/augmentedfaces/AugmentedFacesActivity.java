@@ -18,15 +18,26 @@ package com.google.ar.sceneform.samples.augmentedfaces;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.PixelCopy;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.support.design.widget.Snackbar;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
@@ -45,10 +56,18 @@ import com.google.ar.sceneform.rendering.Texture;
 import com.google.ar.sceneform.ux.AugmentedFaceNode;
 import com.google.ar.sceneform.ux.TransformableNode;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import static android.os.Environment.getExternalStoragePublicDirectory;
 
 /**
  * This is an example activity that uses the Sceneform UX package to make common Augmented Faces
@@ -60,6 +79,9 @@ public class AugmentedFacesActivity extends AppCompatActivity {
   private static final double MIN_OPENGL_VERSION = 3.0;
 
   private FaceArFragment arFragment;
+
+  Button btnTakePic;
+  ImageView imageView;
 
   private ModelRenderable faceRegionsRenderable;
   private Texture faceMeshTexture;
@@ -80,7 +102,9 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     setContentView(R.layout.activity_face_mesh);
     arFragment = (FaceArFragment) getSupportFragmentManager().findFragmentById(R.id.face_fragment);
 
-
+    btnTakePic = findViewById(R.id.btnTakePic);
+    btnTakePic.setOnClickListener(imageView -> takePhoto());
+    imageView = findViewById(R.id.image);
 
     // Load the face mesh texture.
     Texture.builder()
@@ -230,6 +254,76 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     frame6.setOnClickListener(view ->{buildObject("3d-model.sfb");});
     gallery.addView(frame6);
 
+  }
+
+  private String generateFilename() {
+    String date =
+            new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault()).format(new Date());
+    return Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
+  }
+
+  private void saveBitmapToDisk(Bitmap bitmap, String filename) throws IOException {
+
+    File out = new File(filename);
+    if (!out.getParentFile().exists()) {
+      out.getParentFile().mkdirs();
+    }
+    try (FileOutputStream outputStream = new FileOutputStream(filename);
+         ByteArrayOutputStream outputData = new ByteArrayOutputStream()) {
+      bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputData);
+      outputData.writeTo(outputStream);
+      outputStream.flush();
+      outputStream.close();
+    } catch (IOException ex) {
+      throw new IOException("Failed to save bitmap to disk", ex);
+    }
+  }
+
+  private void takePhoto() {
+    final String filename = generateFilename();
+    ArSceneView view = arFragment.getArSceneView();
+
+    // Create a bitmap the size of the scene view.
+    final Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
+            Bitmap.Config.ARGB_8888);
+
+    // Create a handler thread to offload the processing of the image.
+    final HandlerThread handlerThread = new HandlerThread("PixelCopier");
+    handlerThread.start();
+    // Make the request to copy.
+    PixelCopy.request(view, bitmap, (copyResult) -> {
+      if (copyResult == PixelCopy.SUCCESS) {
+        try {
+          saveBitmapToDisk(bitmap, filename);
+        } catch (IOException e) {
+          Toast toast = Toast.makeText(AugmentedFacesActivity.this, e.toString(),
+                  Toast.LENGTH_LONG);
+          toast.show();
+          return;
+        }
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
+                "Photo saved", Snackbar.LENGTH_LONG);
+        snackbar.setAction("Open in Photos", v -> {
+          File photoFile = new File(filename);
+
+          Uri photoURI = FileProvider.getUriForFile(AugmentedFacesActivity.this,
+                  AugmentedFacesActivity.this.getPackageName() + ".ar.codelab.name.provider",
+                  photoFile);
+          Intent intent = new Intent(Intent.ACTION_VIEW, photoURI);
+          intent.setDataAndType(photoURI, "image/*");
+          intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+          startActivity(intent);
+
+        });
+        snackbar.show();
+      } else {
+        Toast toast = Toast.makeText(AugmentedFacesActivity.this,
+                "Failed to copyPixels: " + copyResult, Toast.LENGTH_LONG);
+        toast.show();
+      }
+      handlerThread.quitSafely();
+    }, new Handler(handlerThread.getLooper()));
   }
 
 }

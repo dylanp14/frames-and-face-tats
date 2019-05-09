@@ -19,7 +19,8 @@
     android:layout_height="match_parent"
     tools:context=".AugmentedFacesActivity">
 
-  <fragment android:name="com.google.ar.sceneform.samples.augmentedfaces.FaceArFragment"
+  <fragment
+      android:name="com.google.ar.sceneform.samples.augmentedfaces.FaceArFragment"
       android:id="@+id/face_fragment"
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
@@ -36,5 +37,17 @@
 
   </HorizontalScrollView>
 
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="605dp"
+      android:gravity="bottom|center"
+      android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btnTakePic"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="Take Picture" />
+  </LinearLayout>
 
 </FrameLayout>
