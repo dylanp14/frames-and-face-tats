@@ -75,7 +75,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
  */
 public class AugmentedFacesActivity extends AppCompatActivity {
   private static final String TAG = AugmentedFacesActivity.class.getSimpleName();
-
+  static final int REQUEST_IMAGE_CAPTURE = 1;
   private static final double MIN_OPENGL_VERSION = 3.0;
 
   private FaceArFragment arFragment;
@@ -107,19 +107,21 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     imageView = findViewById(R.id.image);
 
     // Load the face mesh texture.
-    Texture.builder()
-        .setSource(this, R.drawable.peep)
-        .build()
-        .thenAccept(texture -> faceMeshTexture = texture);
 
     ArSceneView sceneView = arFragment.getArSceneView();
 
     initializeFrameGallery();
+    initializeTattooGallery();
     // This is important to make sure that the camera stream renders first so that
     // the face mesh occlusion works correctly.
     sceneView.setCameraStreamRenderPriority(Renderable.RENDER_PRIORITY_FIRST);
 
     Scene scene = sceneView.getScene();
+
+    Texture.builder()
+            .setSource(this, R.drawable.tyson)
+            .build()
+            .thenAccept(texture -> faceMeshTexture = texture);
 
     scene.addOnUpdateListener(
         (FrameTime frameTime) -> {
@@ -187,8 +189,16 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     return true;
   }
 
+  private void buildFaceTexture(String object){
+      Texture.builder()
+              .setSource(this, Uri.parse(object))
+              .build()
+              .thenAccept(texture -> faceMeshTexture = texture);
+
+  }
+
   private void buildObject(String object){
-    Iterator<Map.Entry<AugmentedFace, AugmentedFaceNode>> iter =
+      Iterator<Map.Entry<AugmentedFace, AugmentedFaceNode>> iter =
             faceNodeMap.entrySet().iterator();
     while (iter.hasNext()) {
       Map.Entry<AugmentedFace, AugmentedFaceNode> entry = iter.next();
@@ -199,7 +209,8 @@ public class AugmentedFacesActivity extends AppCompatActivity {
       }
       iter.remove();
     }
-    faceNodeMap.clear();
+    //faceNodeMap.clear();
+
     ModelRenderable.builder()
             .setSource(this, Uri.parse(object))
             .build()
@@ -209,10 +220,6 @@ public class AugmentedFacesActivity extends AppCompatActivity {
                       modelRenderable.setShadowCaster(false);
                       modelRenderable.setShadowReceiver(false);
                     });
-    Texture.builder()
-            .setSource(this, R.drawable.smiley)
-            .build()
-            .thenAccept(texture -> faceMeshTexture = texture);
   }
 
   private void initializeFrameGallery() {
@@ -256,9 +263,26 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
   }
 
+  private void initializeTattooGallery(){
+      LinearLayout tatgallery = findViewById(R.id.tat_gallery_layout);
+
+      ImageView tat1 = new ImageView(this);
+      tat1.setImageResource(R.drawable.snake_display);
+      tat1.setContentDescription("tat1");
+      tat1.setOnClickListener(view ->{buildFaceTexture("snake.png");});
+      tatgallery.addView(tat1);
+
+
+    ImageView tat2 = new ImageView(this);
+    tat2.setImageResource(R.drawable.tyson_display);
+    tat2.setContentDescription("tat2");
+    tat2.setOnClickListener(view ->{buildFaceTexture("tyson.png");});
+    tatgallery.addView(tat2);
+  }
+
   private String generateFilename() {
     String date =
-            new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault()).format(new Date());
+            new SimpleDateFormat("yyyyMMddHHmmSS", java.util.Locale.getDefault()).format(new Date());
     return Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
   }
@@ -308,7 +332,7 @@ public class AugmentedFacesActivity extends AppCompatActivity {
           File photoFile = new File(filename);
 
           Uri photoURI = FileProvider.getUriForFile(AugmentedFacesActivity.this,
-                  AugmentedFacesActivity.this.getPackageName() + ".ar.codelab.name.provider",
+                  AugmentedFacesActivity.this.getPackageName() + ".provider",
                   photoFile);
           Intent intent = new Intent(Intent.ACTION_VIEW, photoURI);
           intent.setDataAndType(photoURI, "image/*");
